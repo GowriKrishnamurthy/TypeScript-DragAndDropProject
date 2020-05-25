@@ -1,7 +1,7 @@
 {
   "name": "draganddropproject",
   "version": "1.0.0",
-  "description": "",
+  "description": "Typescript",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,5 +11,14 @@
   "license": "ISC",
   "devDependencies": {
     "lite-server": "^2.5.4"
-  }
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GowriKrishnamurthy/Drag-And-Drop-Project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GowriKrishnamurthy/Drag-And-Drop-Project/issues"
+  },
+  "homepage": "https://github.com/GowriKrishnamurthy/Drag-And-Drop-Project#readme"
 }
