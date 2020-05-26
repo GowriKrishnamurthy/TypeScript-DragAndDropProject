@@ -17,6 +17,31 @@ function AutoBind(
     return adjDescriptor;
 }
 
+//Project list class
+class ProjectList{    
+    templateElement: HTMLTemplateElement; //template
+    hostElement: HTMLDivElement; //div
+    element: HTMLElement; //section element
+
+    constructor(private type:'active'|'finished'){
+        this.templateElement = document.getElementById('project-list')! as HTMLTemplateElement;
+        this.hostElement = document.getElementById('app')! as HTMLDivElement;
+
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.element = importedNode.firstElementChild! as HTMLElement;
+        this.element.id =`${this.type}-projects`;
+
+        //Attach element
+        this.hostElement.insertAdjacentElement('beforeend', this.element);
+        this.renderContent();
+    }
+
+    private renderContent(){
+        const listId=`${this.type}-projects-list`; 
+        this.element.querySelector('ul')!.id = listId;
+        this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
+}
 class ProjectInput {
     templateElement: HTMLTemplateElement; //template
     hostElement: HTMLDivElement; //div
@@ -104,8 +129,6 @@ class ProjectInput {
         this.clearInputs();
     }
 }
-const projInput = new ProjectInput();
-
 
 interface IValidatable {
     value: string | number;
@@ -153,3 +176,7 @@ function validate(validatableInput: IValidatable) {
     }
     return isValid;
 }
+
+const projectInput = new ProjectInput();
+const activeProjectList = new ProjectList('active');
+const finishedProjectList = new ProjectList('finished');
