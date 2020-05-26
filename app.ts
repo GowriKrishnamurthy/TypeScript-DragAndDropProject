@@ -1,3 +1,20 @@
+// AutoBind decorator
+function AutoBind(
+    _: any,
+    _2: string,
+    descriptor: PropertyDescriptor
+  ) {
+    const originalMethod = descriptor.value;
+    const adjDescriptor: PropertyDescriptor = {
+      configurable: true,
+      get() {
+        const boundFn = originalMethod.bind(this);
+        return boundFn;
+      }
+    };
+    return adjDescriptor;
+  }
+  
 class ProjectInput{
     templateElement: HTMLTemplateElement; //template
     hostElement:HTMLDivElement; //div
@@ -27,7 +44,7 @@ class ProjectInput{
         //Attach element
         this.hostElement.insertAdjacentElement('afterbegin',this.element);
     }
-    
+    @AutoBind
     private submitEventHandler(event:Event)
     {
         //prevent the default form submission
