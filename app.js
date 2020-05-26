@@ -33,10 +33,37 @@ class ProjectInput {
         //Attach element
         this.hostElement.insertAdjacentElement('afterbegin', this.element);
     }
+    getUserInputs() {
+        const titleInputValue = this.titleInputElement.value;
+        const descriptionInputValue = this.descriptionInputElement.value;
+        const peopleInputValue = this.peopleInputElement.value;
+        //If the values are not entered
+        if (titleInputValue.trim().length === 0 ||
+            descriptionInputValue.trim().length === 0 ||
+            peopleInputValue.trim().length === 0) {
+            alert('Invalid input, please try again');
+            return;
+        }
+        else {
+            return [titleInputValue, descriptionInputValue, +peopleInputValue];
+        }
+    }
+    //Clear input field values
+    clearInputs() {
+        this.titleInputElement.value = '';
+        this.descriptionInputElement.value = '';
+        this.peopleInputElement.value = '';
+    }
     submitEventHandler(event) {
-        //prevent the default form submission
+        //prevent the default form submsion
         event.preventDefault();
-        console.log(this.titleInputElement.value);
+        const userInputs = this.getUserInputs();
+        if (Array.isArray(userInputs)) {
+            const [title, description, people] = userInputs;
+            console.log(title, description, people);
+        }
+        //Clear the input fields after the form is submitted
+        this.clearInputs();
     }
 }
 __decorate([
