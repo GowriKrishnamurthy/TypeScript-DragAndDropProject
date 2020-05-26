@@ -37,10 +37,25 @@ class ProjectInput {
         const titleInputValue = this.titleInputElement.value;
         const descriptionInputValue = this.descriptionInputElement.value;
         const peopleInputValue = this.peopleInputElement.value;
-        //If the values are not entered
-        if (titleInputValue.trim().length === 0 ||
-            descriptionInputValue.trim().length === 0 ||
-            peopleInputValue.trim().length === 0) {
+        const titleValidate = {
+            value: titleInputValue,
+            required: true
+        };
+        const descriptionValidate = {
+            value: descriptionInputValue,
+            required: true,
+            minLength: 5
+        };
+        const peopleValidate = {
+            value: +peopleInputValue,
+            required: true,
+            min: 1,
+            max: 5
+        };
+        //If any of the values is not entered correctly
+        if (!validate(titleValidate) ||
+            !validate(descriptionValidate) ||
+            !validate(peopleValidate)) {
             alert('Invalid input, please try again');
             return;
         }
@@ -70,3 +85,35 @@ __decorate([
     AutoBind
 ], ProjectInput.prototype, "submitEventHandler", null);
 const projInput = new ProjectInput();
+function validate(validatableInput) {
+    let isValid = true;
+    if (validatableInput.required) {
+        isValid =
+            isValid && (validatableInput.value.toString().trim.length !== 0);
+    }
+    // min length makes sense only for string input
+    if (validatableInput.minLength != null
+        && typeof validatableInput.value === 'string') {
+        isValid =
+            isValid && (validatableInput.value.length >= validatableInput.minLength);
+    }
+    // max length makes sense only for string input
+    if (validatableInput.maxLength != null
+        && typeof validatableInput.value === 'string') {
+        isValid =
+            isValid && (validatableInput.value.length <= validatableInput.maxLength);
+    }
+    // min  makes sense only for number input
+    if (validatableInput.min != null
+        && typeof validatableInput.value === 'number') {
+        isValid =
+            isValid && (validatableInput.value >= validatableInput.min);
+    }
+    // max  makes sense only for number input
+    if (validatableInput.max != null
+        && typeof validatableInput.value === 'number') {
+        isValid =
+            isValid && (validatableInput.value <= validatableInput.max);
+    }
+    return isValid;
+}
