@@ -103,15 +103,21 @@ class Component {
     }
 }
 //Project list class
-class ProjectList {
+class ProjectList extends Component {
     constructor(type) {
+        //beforeend
+        super('project-list', 'app', false, `${type}-projects`);
         this.type = type;
         this.assignedProjects = [];
-        this.templateElement = document.getElementById('project-list');
-        this.hostElement = document.getElementById('app');
-        const importedNode = document.importNode(this.templateElement.content, true);
-        this.element = importedNode.firstElementChild;
-        this.element.id = `${this.type}-projects`;
+        this.configure();
+        this.renderContent();
+    }
+    renderContent() {
+        const listId = `${this.type}-projects-list`;
+        this.element.querySelector('ul').id = listId;
+        this.element.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
+    configure() {
         projectState.addSubscribers((projects) => {
             const relevantProjects = projects.filter(proj => {
                 if (this.type === 'active')
@@ -122,14 +128,6 @@ class ProjectList {
             this.assignedProjects = relevantProjects;
             this.renderAllProjects();
         });
-        //Attach element
-        this.hostElement.insertAdjacentElement('beforeend', this.element);
-        this.renderContent();
-    }
-    renderContent() {
-        const listId = `${this.type}-projects-list`;
-        this.element.querySelector('ul').id = listId;
-        this.element.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
     }
     renderAllProjects() {
         const listProjectListElement = document.getElementById(`${this.type}-projects-list`);
@@ -142,22 +140,20 @@ class ProjectList {
         });
     }
 }
-class NewProjectInput {
+class NewProjectInput extends Component {
     constructor() {
-        this.templateElement = document.getElementById('new-project');
-        this.hostElement = document.getElementById('app');
-        const importedNode = document.importNode(this.templateElement.content, true);
-        this.element = importedNode.firstElementChild;
-        this.element.id = "user-input";
+        super('new-project', 'app', true, 'user-input');
         //Input Controls on the form    
         this.projectTitleInputElement = this.element.querySelector('#projectTitle');
         this.projectDescriptionInputElement = this.element.querySelector('#projectDescription');
         this.numberOfPeopleInputElement = this.element.querySelector('#numberOfPeople');
+        this.configure();
+    }
+    configure() {
         //Add submit event handler ot form
         this.element.addEventListener('submit', this.submitEventHandler.bind(this));
-        //Attach element
-        this.hostElement.insertAdjacentElement('afterbegin', this.element);
     }
+    renderContent() { }
     getUserInputs() {
         const projectTitleInputValue = this.projectTitleInputElement.value;
         const projectDescriptionInputValue = this.projectDescriptionInputElement.value;
