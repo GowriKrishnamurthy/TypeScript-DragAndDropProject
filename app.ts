@@ -1,5 +1,3 @@
-
-
 interface IValidatable {
     value: string | number;
     required?: boolean;
@@ -14,7 +12,7 @@ function validate(validatableInput: IValidatable) {
 
     if (validatableInput.required) {
         isValid =
-            isValid && (validatableInput.value.toString().trim.length !== 0)
+            isValid && (validatableInput.value.toString().length !== 0)
     }
 
     // min length makes sense only for string input
@@ -89,18 +87,18 @@ class ProjectList{
         this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
     }
 }
-class ProjectInput {
+class NewProjectInput {
     templateElement: HTMLTemplateElement; //template
     hostElement: HTMLDivElement; //div
     element: HTMLFormElement; //form
 
     //Input Controls on the form 
-    titleInputElement: HTMLInputElement;
-    descriptionInputElement: HTMLInputElement;
-    peopleInputElement: HTMLInputElement;
+    projectTitleInputElement: HTMLInputElement;
+    projectDescriptionInputElement: HTMLInputElement;
+    numberOfPeopleInputElement: HTMLInputElement;
 
     constructor() {
-        this.templateElement = document.getElementById('project-input')! as HTMLTemplateElement;
+        this.templateElement = document.getElementById('new-project')! as HTMLTemplateElement;
         this.hostElement = document.getElementById('app')! as HTMLDivElement;
 
         const importedNode = document.importNode(this.templateElement.content, true);
@@ -108,9 +106,9 @@ class ProjectInput {
         this.element.id = "user-input";
 
         //Input Controls on the form    
-        this.titleInputElement = this.element.querySelector('#title') as HTMLInputElement;
-        this.descriptionInputElement = this.element.querySelector('#description') as HTMLInputElement;
-        this.peopleInputElement = this.element.querySelector('#people') as HTMLInputElement;
+        this.projectTitleInputElement = this.element.querySelector('#projectTitle') as HTMLInputElement;
+        this.projectDescriptionInputElement = this.element.querySelector('#projectDescription') as HTMLInputElement;
+        this.numberOfPeopleInputElement = this.element.querySelector('#numberOfPeople') as HTMLInputElement;
 
         //Add submit event handler ot form
         this.element.addEventListener('submit', this.submitEventHandler.bind(this));
@@ -119,21 +117,21 @@ class ProjectInput {
         this.hostElement.insertAdjacentElement('afterbegin', this.element);
     }
     private getUserInputs(): [string, string, number] | void {
-        const titleInputValue = this.titleInputElement.value;
-        const descriptionInputValue = this.descriptionInputElement.value;
-        const peopleInputValue = this.peopleInputElement.value;
+        const projectTitleInputValue = this.projectTitleInputElement.value;
+        const projectDescriptionInputValue = this.projectDescriptionInputElement.value;
+        const numberOfPeopleInputValue = this.numberOfPeopleInputElement.value;
 
-        const titleValidate:IValidatable = {
-            value: titleInputValue,
+        const projectTitleValidate:IValidatable = {
+            value: projectTitleInputValue,
             required:true
         };
-        const descriptionValidate:IValidatable = {
-            value: descriptionInputValue,
+        const projectDescriptionValidate:IValidatable = {
+            value: projectDescriptionInputValue,
             required:true,
             minLength:5
         };
-        const peopleValidate:IValidatable = {
-            value: +peopleInputValue,
+        const numberOfPeopleValidate:IValidatable = {
+            value: +numberOfPeopleInputValue,
             required:true,
             min:1,
             max:5
@@ -141,23 +139,23 @@ class ProjectInput {
         };
         //If any of the values is not entered correctly
         if (
-            !validate(titleValidate) ||
-            !validate(descriptionValidate) ||
-            !validate(peopleValidate)
+            !validate(projectTitleValidate) ||
+            !validate(projectDescriptionValidate) ||
+            !validate(numberOfPeopleValidate)
             ) {
                 alert('Invalid input, please try again');     
                 return ;           
             }
             else {
-                return [titleInputValue, descriptionInputValue, +peopleInputValue];            
+                return [projectTitleInputValue, projectDescriptionInputValue, +numberOfPeopleInputValue];            
             }
     }
 
     //Clear input field values
     private clearInputs(){
-        this.titleInputElement.value = '';
-        this.descriptionInputElement.value = '';
-        this.peopleInputElement.value = '';
+        this.projectTitleInputElement.value = '';
+        this.projectDescriptionInputElement.value = '';
+        this.numberOfPeopleInputElement.value = '';
     }
 
     @AutoBind
@@ -169,14 +167,14 @@ class ProjectInput {
 
         if(Array.isArray(userInputs))
         {
-            const [title, description, people] = userInputs;
-            console.log(title, description, people);
+            const [projectTitle, projectDescription, numberOfPeople] = userInputs;
+            console.log(projectTitle, projectDescription, numberOfPeople);
         }
         //Clear the input fields after the form is submitted
         this.clearInputs();
     }
 }
 
-const projectInput = new ProjectInput();
+const newprojectInput = new NewProjectInput();
 const activeProjectList = new ProjectList('active');
 const finishedProjectList = new ProjectList('finished');

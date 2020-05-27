@@ -9,7 +9,7 @@ function validate(validatableInput) {
     let isValid = true;
     if (validatableInput.required) {
         isValid =
-            isValid && (validatableInput.value.toString().trim.length !== 0);
+            isValid && (validatableInput.value.toString().length !== 0);
     }
     // min length makes sense only for string input
     if (validatableInput.minLength != null
@@ -68,65 +68,65 @@ class ProjectList {
         this.element.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
     }
 }
-class ProjectInput {
+class NewProjectInput {
     constructor() {
-        this.templateElement = document.getElementById('project-input');
+        this.templateElement = document.getElementById('new-project');
         this.hostElement = document.getElementById('app');
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
         this.element.id = "user-input";
         //Input Controls on the form    
-        this.titleInputElement = this.element.querySelector('#title');
-        this.descriptionInputElement = this.element.querySelector('#description');
-        this.peopleInputElement = this.element.querySelector('#people');
+        this.projectTitleInputElement = this.element.querySelector('#projectTitle');
+        this.projectDescriptionInputElement = this.element.querySelector('#projectDescription');
+        this.numberOfPeopleInputElement = this.element.querySelector('#numberOfPeople');
         //Add submit event handler ot form
         this.element.addEventListener('submit', this.submitEventHandler.bind(this));
         //Attach element
         this.hostElement.insertAdjacentElement('afterbegin', this.element);
     }
     getUserInputs() {
-        const titleInputValue = this.titleInputElement.value;
-        const descriptionInputValue = this.descriptionInputElement.value;
-        const peopleInputValue = this.peopleInputElement.value;
-        const titleValidate = {
-            value: titleInputValue,
+        const projectTitleInputValue = this.projectTitleInputElement.value;
+        const projectDescriptionInputValue = this.projectDescriptionInputElement.value;
+        const numberOfPeopleInputValue = this.numberOfPeopleInputElement.value;
+        const projectTitleValidate = {
+            value: projectTitleInputValue,
             required: true
         };
-        const descriptionValidate = {
-            value: descriptionInputValue,
+        const projectDescriptionValidate = {
+            value: projectDescriptionInputValue,
             required: true,
             minLength: 5
         };
-        const peopleValidate = {
-            value: +peopleInputValue,
+        const numberOfPeopleValidate = {
+            value: +numberOfPeopleInputValue,
             required: true,
             min: 1,
             max: 5
         };
         //If any of the values is not entered correctly
-        if (!validate(titleValidate) ||
-            !validate(descriptionValidate) ||
-            !validate(peopleValidate)) {
+        if (!validate(projectTitleValidate) ||
+            !validate(projectDescriptionValidate) ||
+            !validate(numberOfPeopleValidate)) {
             alert('Invalid input, please try again');
             return;
         }
         else {
-            return [titleInputValue, descriptionInputValue, +peopleInputValue];
+            return [projectTitleInputValue, projectDescriptionInputValue, +numberOfPeopleInputValue];
         }
     }
     //Clear input field values
     clearInputs() {
-        this.titleInputElement.value = '';
-        this.descriptionInputElement.value = '';
-        this.peopleInputElement.value = '';
+        this.projectTitleInputElement.value = '';
+        this.projectDescriptionInputElement.value = '';
+        this.numberOfPeopleInputElement.value = '';
     }
     submitEventHandler(event) {
         //prevent the default form submsion
         event.preventDefault();
         const userInputs = this.getUserInputs();
         if (Array.isArray(userInputs)) {
-            const [title, description, people] = userInputs;
-            console.log(title, description, people);
+            const [projectTitle, projectDescription, numberOfPeople] = userInputs;
+            console.log(projectTitle, projectDescription, numberOfPeople);
         }
         //Clear the input fields after the form is submitted
         this.clearInputs();
@@ -134,7 +134,7 @@ class ProjectInput {
 }
 __decorate([
     AutoBind
-], ProjectInput.prototype, "submitEventHandler", null);
-const projectInput = new ProjectInput();
+], NewProjectInput.prototype, "submitEventHandler", null);
+const newprojectInput = new NewProjectInput();
 const activeProjectList = new ProjectList('active');
 const finishedProjectList = new ProjectList('finished');
