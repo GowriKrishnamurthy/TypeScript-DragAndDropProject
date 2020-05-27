@@ -109,13 +109,25 @@ class ProjectItem extends Component {
         this.configure();
         this.renderContent();
     }
-    configure() { }
+    dragStartHandler(event) {
+        throw new Error("Method not implemented.");
+    }
+    dragEndHandler(event) {
+        throw new Error("Method not implemented.");
+    }
+    configure() {
+        this.element.addEventListener('dragstart', this.dragStartHandler);
+        this.element.addEventListener('dragend', this.dragEndHandler);
+    }
     renderContent() {
         this.element.querySelector('h2').textContent = this.project.projectTitle;
         this.element.querySelector('h3').textContent = this.project.numberOfPeople.toString();
         this.element.querySelector('p').textContent = this.project.projectDescription;
     }
 }
+__decorate([
+    AutoBind
+], ProjectItem.prototype, "dragStartHandler", null);
 //Project list class
 class ProjectList extends Component {
     constructor(type) {
