@@ -86,6 +86,22 @@ function AutoBind(_, _2, descriptor) {
     };
     return adjDescriptor;
 }
+//Generic Component base class
+class Component {
+    constructor(templateElementID, hostElementID, insertAtStart, newElementID) {
+        this.templateElement = document.getElementById(templateElementID);
+        this.hostElement = document.getElementById(hostElementID);
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.element = importedNode.firstElementChild;
+        if (newElementID)
+            this.element.id = newElementID;
+        this.attachElement(insertAtStart);
+    }
+    attachElement(insertAtStart) {
+        //Attach element
+        this.hostElement.insertAdjacentElement(insertAtStart ? 'afterbegin' : 'beforeend', this.element);
+    }
+}
 //Project list class
 class ProjectList {
     constructor(type) {
