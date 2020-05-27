@@ -1,3 +1,44 @@
+//Project state management
+class ProjectState {
+
+    private projects: any[] = [];
+    private subscribers: any[] = [];
+    private static projectStateInstance: ProjectState;
+
+    private constructor() {
+
+    }
+
+    addSubscribers(subscriberFunction:Function){
+     this.subscribers.push(subscriberFunction)   ;
+    }
+    // Only one instance of project state class maintained
+    static getProjectStateInstance() {
+        if (this.projectStateInstance)
+            return this.projectStateInstance;
+        else
+            return new ProjectState();
+    }
+
+    addProject(title: string, description: string, numberOfPeople: number) {
+        const newproject = {
+            id: Math.random().toString(),
+            title: title,
+            description: description,
+            numberOfPeople: numberOfPeople
+        }
+        
+        this.projects.push(newproject);
+        
+        // Loop through all subscribers
+        this.subscribers.forEach(subscriberFunction => {            
+            subscriberFunction(this.projects.slice());
+        });        
+    }
+}
+// Singleton object - global state management object
+const projectState = ProjectState.getProjectStateInstance();
+
 interface IValidatable {
     value: string | number;
     required?: boolean;
@@ -63,28 +104,41 @@ function AutoBind(
 }
 
 //Project list class
-class ProjectList{    
+class ProjectList {
     templateElement: HTMLTemplateElement; //template
     hostElement: HTMLDivElement; //div
     element: HTMLElement; //section element
-
-    constructor(private type:'active'|'finished'){
+    assignedProjects:any[]=[];
+    constructor(private type: 'active' | 'finished') {
         this.templateElement = document.getElementById('project-list')! as HTMLTemplateElement;
         this.hostElement = document.getElementById('app')! as HTMLDivElement;
 
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild! as HTMLElement;
-        this.element.id =`${this.type}-projects`;
+        this.element.id = `${this.type}-projects`;
+
+        projectState.addSubscribers((projects:any)=>{
+            this.assignedProjects=projects;
+            this.renderAllProjects();
+        });
 
         //Attach element
         this.hostElement.insertAdjacentElement('beforeend', this.element);
         this.renderContent();
     }
 
-    private renderContent(){
-        const listId=`${this.type}-projects-list`; 
+    private renderContent() {
+        const listId = `${this.type}-projects-list`;
         this.element.querySelector('ul')!.id = listId;
         this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
+    private renderAllProjects() {
+        const listProjectListElement = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+        this.assignedProjects.forEach(project => {
+            const listItem = document.createElement('li');
+            listItem.textContent =  project.title;
+            listProjectListElement.appendChild(listItem);
+        });        
     }
 }
 class NewProjectInput {
@@ -121,20 +175,20 @@ class NewProjectInput {
         const projectDescriptionInputValue = this.projectDescriptionInputElement.value;
         const numberOfPeopleInputValue = this.numberOfPeopleInputElement.value;
 
-        const projectTitleValidate:IValidatable = {
+        const projectTitleValidate: IValidatable = {
             value: projectTitleInputValue,
-            required:true
+            required: true
         };
-        const projectDescriptionValidate:IValidatable = {
+        const projectDescriptionValidate: IValidatable = {
             value: projectDescriptionInputValue,
-            required:true,
-            minLength:5
+            required: true,
+            minLength: 5
         };
-        const numberOfPeopleValidate:IValidatable = {
+        const numberOfPeopleValidate: IValidatable = {
             value: +numberOfPeopleInputValue,
-            required:true,
-            min:1,
-            max:5
+            required: true,
+            min: 1,
+            max: 100
 
         };
         //If any of the values is not entered correctly
@@ -142,17 +196,17 @@ class NewProjectInput {
             !validate(projectTitleValidate) ||
             !validate(projectDescriptionValidate) ||
             !validate(numberOfPeopleValidate)
-            ) {
-                alert('Invalid input, please try again');     
-                return ;           
-            }
-            else {
-                return [projectTitleInputValue, projectDescriptionInputValue, +numberOfPeopleInputValue];            
-            }
+        ) {
+            alert('Invalid input, please try again');
+            return;
+        }
+        else {
+            return [projectTitleInputValue, projectDescriptionInputValue, +numberOfPeopleInputValue];
+        }
     }
 
     //Clear input field values
-    private clearInputs(){
+    private clearInputs() {
         this.projectTitleInputElement.value = '';
         this.projectDescriptionInputElement.value = '';
         this.numberOfPeopleInputElement.value = '';
@@ -160,14 +214,17 @@ class NewProjectInput {
 
     @AutoBind
     private submitEventHandler(event: Event) {
-        
+
         //prevent the default form submsion
         event.preventDefault();
         const userInputs = this.getUserInputs();
 
-        if(Array.isArray(userInputs))
-        {
+        if (Array.isArray(userInputs)) {
             const [projectTitle, projectDescription, numberOfPeople] = userInputs;
+
+            //Add new project to global project state manager
+            projectState.addProject(projectTitle, projectDescription, numberOfPeople);
+
             console.log(projectTitle, projectDescription, numberOfPeople);
         }
         //Clear the input fields after the form is submitted

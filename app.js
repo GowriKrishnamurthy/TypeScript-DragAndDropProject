@@ -5,6 +5,38 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+//Project state management
+class ProjectState {
+    constructor() {
+        this.projects = [];
+        this.subscribers = [];
+    }
+    addSubscribers(subscriberFunction) {
+        this.subscribers.push(subscriberFunction);
+    }
+    // Only one instance of project state class maintained
+    static getProjectStateInstance() {
+        if (this.projectStateInstance)
+            return this.projectStateInstance;
+        else
+            return new ProjectState();
+    }
+    addProject(title, description, numberOfPeople) {
+        const newproject = {
+            id: Math.random().toString(),
+            title: title,
+            description: description,
+            numberOfPeople: numberOfPeople
+        };
+        this.projects.push(newproject);
+        // Loop through all subscribers
+        this.subscribers.forEach(subscriberFunction => {
+            subscriberFunction(this.projects.slice());
+        });
+    }
+}
+// Singleton object - global state management object
+const projectState = ProjectState.getProjectStateInstance();
 function validate(validatableInput) {
     let isValid = true;
     if (validatableInput.required) {
@@ -53,11 +85,16 @@ function AutoBind(_, _2, descriptor) {
 class ProjectList {
     constructor(type) {
         this.type = type;
+        this.assignedProjects = [];
         this.templateElement = document.getElementById('project-list');
         this.hostElement = document.getElementById('app');
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
         this.element.id = `${this.type}-projects`;
+        projectState.addSubscribers((projects) => {
+            this.assignedProjects = projects;
+            this.renderAllProjects();
+        });
         //Attach element
         this.hostElement.insertAdjacentElement('beforeend', this.element);
         this.renderContent();
@@ -66,6 +103,14 @@ class ProjectList {
         const listId = `${this.type}-projects-list`;
         this.element.querySelector('ul').id = listId;
         this.element.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
+    renderAllProjects() {
+        const listProjectListElement = document.getElementById(`${this.type}-projects-list`);
+        this.assignedProjects.forEach(project => {
+            const listItem = document.createElement('li');
+            listItem.textContent = project.title;
+            listProjectListElement.appendChild(listItem);
+        });
     }
 }
 class NewProjectInput {
@@ -101,7 +146,7 @@ class NewProjectInput {
             value: +numberOfPeopleInputValue,
             required: true,
             min: 1,
-            max: 5
+            max: 100
         };
         //If any of the values is not entered correctly
         if (!validate(projectTitleValidate) ||
@@ -126,6 +171,8 @@ class NewProjectInput {
         const userInputs = this.getUserInputs();
         if (Array.isArray(userInputs)) {
             const [projectTitle, projectDescription, numberOfPeople] = userInputs;
+            //Add new project to global project state manager
+            projectState.addProject(projectTitle, projectDescription, numberOfPeople);
             console.log(projectTitle, projectDescription, numberOfPeople);
         }
         //Clear the input fields after the form is submitted
