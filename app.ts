@@ -139,17 +139,35 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement>
         this.hostElement.insertAdjacentElement(insertAtStart ? 'afterbegin' : 'beforeend',
             this.element);
     }
-    abstract configure():void;
-    abstract renderContent():void;
+    abstract configure(): void;
+    abstract renderContent(): void;
 }
 
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
+{
+    private project: Project;
+
+    constructor(hostID: string, project: Project) {
+        super('project-item', hostID, false, project.projectId);
+        this.project = project;
+        this.configure();
+        this.renderContent();
+    }
+
+    configure(): void { }
+    renderContent(): void {
+        this.element.querySelector('h2')!.textContent = this.project.projectTitle;
+        this.element.querySelector('h3')!.textContent = this.project.numberOfPeople.toString();
+        this.element.querySelector('p')!.textContent = this.project.projectDescription;
+    }
+}
 //Project list class
-class ProjectList extends Component<HTMLDivElement, HTMLElement> 
-{    
+class ProjectList extends Component<HTMLDivElement, HTMLElement>
+{
     assignedProjects: Project[] = [];
     constructor(private type: 'active' | 'finished') {
         //beforeend
-        super('project-list','app',false,`${type}-projects`);
+        super('project-list', 'app', false, `${type}-projects`);
         this.configure();
         this.renderContent();
     }
@@ -176,9 +194,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
         //Avoiding project duplication, render always from the scratch
         listProjectListElement.innerHTML = '';
         this.assignedProjects.forEach(project => {
-            const listItem = document.createElement('li');
-            listItem.textContent = project.projectTitle;
-            listProjectListElement.appendChild(listItem);
+            new ProjectItem(this.element.querySelector('ul')!.id,project); 
         });
     }
 }
@@ -189,7 +205,7 @@ class NewProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     numberOfPeopleInputElement: HTMLInputElement;
 
     constructor() {
-        super('new-project','app',true,'user-input');        
+        super('new-project', 'app', true, 'user-input');
 
         //Input Controls on the form    
         this.projectTitleInputElement = this.element.querySelector('#projectTitle') as HTMLInputElement;
@@ -198,7 +214,7 @@ class NewProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 
         this.configure();
     }
-    
+
     configure(): void {
         //Add submit event handler ot form
         this.element.addEventListener('submit', this.submitEventHandler.bind(this));

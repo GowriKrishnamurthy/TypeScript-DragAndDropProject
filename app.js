@@ -102,6 +102,20 @@ class Component {
         this.hostElement.insertAdjacentElement(insertAtStart ? 'afterbegin' : 'beforeend', this.element);
     }
 }
+class ProjectItem extends Component {
+    constructor(hostID, project) {
+        super('project-item', hostID, false, project.projectId);
+        this.project = project;
+        this.configure();
+        this.renderContent();
+    }
+    configure() { }
+    renderContent() {
+        this.element.querySelector('h2').textContent = this.project.projectTitle;
+        this.element.querySelector('h3').textContent = this.project.numberOfPeople.toString();
+        this.element.querySelector('p').textContent = this.project.projectDescription;
+    }
+}
 //Project list class
 class ProjectList extends Component {
     constructor(type) {
@@ -134,9 +148,7 @@ class ProjectList extends Component {
         //Avoiding project duplication, render always from the scratch
         listProjectListElement.innerHTML = '';
         this.assignedProjects.forEach(project => {
-            const listItem = document.createElement('li');
-            listItem.textContent = project.projectTitle;
-            listProjectListElement.appendChild(listItem);
+            new ProjectItem(this.element.querySelector('ul').id, project);
         });
     }
 }
