@@ -5,7 +5,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-//Project state management
+//Project type
+var ProjectStatus;
+(function (ProjectStatus) {
+    ProjectStatus[ProjectStatus["Active"] = 0] = "Active";
+    ProjectStatus[ProjectStatus["Finished"] = 1] = "Finished";
+})(ProjectStatus || (ProjectStatus = {}));
+class Project {
+    constructor(projectId, projectTitle, projectDescription, numberOfPeople, projectStatus) {
+        this.projectId = projectId;
+        this.projectTitle = projectTitle;
+        this.projectDescription = projectDescription;
+        this.numberOfPeople = numberOfPeople;
+        this.projectStatus = projectStatus;
+    }
+}
 class ProjectState {
     constructor() {
         this.projects = [];
@@ -21,13 +35,8 @@ class ProjectState {
         else
             return new ProjectState();
     }
-    addProject(title, description, numberOfPeople) {
-        const newproject = {
-            id: Math.random().toString(),
-            title: title,
-            description: description,
-            numberOfPeople: numberOfPeople
-        };
+    addProject(projectTitle, projectDescription, numberOfPeople) {
+        const newproject = new Project(Math.random().toString(), projectTitle, projectDescription, numberOfPeople, ProjectStatus.Active);
         this.projects.push(newproject);
         // Loop through all subscribers
         this.subscribers.forEach(subscriberFunction => {
@@ -108,7 +117,7 @@ class ProjectList {
         const listProjectListElement = document.getElementById(`${this.type}-projects-list`);
         this.assignedProjects.forEach(project => {
             const listItem = document.createElement('li');
-            listItem.textContent = project.title;
+            listItem.textContent = project.projectTitle;
             listProjectListElement.appendChild(listItem);
         });
     }

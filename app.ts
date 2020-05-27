@@ -1,16 +1,30 @@
+//Project type
+enum ProjectStatus {
+    Active,
+    Finished
+}
+
+class Project {
+    constructor(
+        public projectId: string,
+        public projectTitle: string,
+        public projectDescription: string,
+        public numberOfPeople: number,
+        public projectStatus: ProjectStatus) { }
+}
 //Project state management
+type Subscribers = (items: Project[]) => void;
+
 class ProjectState {
 
-    private projects: any[] = [];
-    private subscribers: any[] = [];
+    private projects: Project[] = [];
+    private subscribers: Subscribers[] = [];
     private static projectStateInstance: ProjectState;
 
-    private constructor() {
+    private constructor() { }
 
-    }
-
-    addSubscribers(subscriberFunction:Function){
-     this.subscribers.push(subscriberFunction)   ;
+    addSubscribers(subscriberFunction: Subscribers) {
+        this.subscribers.push(subscriberFunction);
     }
     // Only one instance of project state class maintained
     static getProjectStateInstance() {
@@ -20,20 +34,21 @@ class ProjectState {
             return new ProjectState();
     }
 
-    addProject(title: string, description: string, numberOfPeople: number) {
-        const newproject = {
-            id: Math.random().toString(),
-            title: title,
-            description: description,
-            numberOfPeople: numberOfPeople
-        }
-        
+    addProject(projectTitle: string, projectDescription: string, numberOfPeople: number) {
+        const newproject = new Project(
+            Math.random().toString(),
+            projectTitle,
+            projectDescription,
+            numberOfPeople,
+            ProjectStatus.Active
+        );
+
         this.projects.push(newproject);
-        
+
         // Loop through all subscribers
-        this.subscribers.forEach(subscriberFunction => {            
+        this.subscribers.forEach(subscriberFunction => {
             subscriberFunction(this.projects.slice());
-        });        
+        });
     }
 }
 // Singleton object - global state management object
@@ -108,7 +123,7 @@ class ProjectList {
     templateElement: HTMLTemplateElement; //template
     hostElement: HTMLDivElement; //div
     element: HTMLElement; //section element
-    assignedProjects:any[]=[];
+    assignedProjects: Project[] = [];
     constructor(private type: 'active' | 'finished') {
         this.templateElement = document.getElementById('project-list')! as HTMLTemplateElement;
         this.hostElement = document.getElementById('app')! as HTMLDivElement;
@@ -117,8 +132,8 @@ class ProjectList {
         this.element = importedNode.firstElementChild! as HTMLElement;
         this.element.id = `${this.type}-projects`;
 
-        projectState.addSubscribers((projects:any)=>{
-            this.assignedProjects=projects;
+        projectState.addSubscribers((projects: Project[]) => {
+            this.assignedProjects = projects;
             this.renderAllProjects();
         });
 
@@ -136,9 +151,9 @@ class ProjectList {
         const listProjectListElement = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
         this.assignedProjects.forEach(project => {
             const listItem = document.createElement('li');
-            listItem.textContent =  project.title;
+            listItem.textContent = project.projectTitle;
             listProjectListElement.appendChild(listItem);
-        });        
+        });
     }
 }
 class NewProjectInput {
