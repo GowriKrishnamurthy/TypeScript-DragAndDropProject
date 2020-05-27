@@ -2,15 +2,14 @@
 interface Draggable {
     dragStartHandler(event: DragEvent): void;
     dragEndHandler(event: DragEvent): void;
-  }
-  
-  interface DragTarget {
+}
+
+interface DragTarget {
     dragOverHandler(event: DragEvent): void;
     dropHandler(event: DragEvent): void;
     dragLeaveHandler(event: DragEvent): void;
-  }
+}
 
-  
 //Project type
 enum ProjectStatus {
     Active,
@@ -157,8 +156,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement>
 }
 
 class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
-    implements Draggable
-{
+    implements Draggable {
     private project: Project;
 
     constructor(hostID: string, project: Project) {
@@ -169,16 +167,18 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
     }
 
     @AutoBind
-    dragStartHandler(event: DragEvent): void {
-        throw new Error("Method not implemented.");
-    }
-    dragEndHandler(event: DragEvent): void {
-        throw new Error("Method not implemented.");
+    dragStartHandler(event: DragEvent) {
+        event.dataTransfer!.setData('text/plain',this.project.projectId);
+        event.dataTransfer!.effectAllowed = 'move';
     }
 
-    configure(){
-        this.element.addEventListener('dragstart',this.dragStartHandler);
-        this.element.addEventListener('dragend',this.dragEndHandler);
+    dragEndHandler(_: DragEvent) {
+        console.log('DragEnd');
+    }
+
+    configure() {
+        this.element.addEventListener('dragstart', this.dragStartHandler);
+        this.element.addEventListener('dragend', this.dragEndHandler);
     }
     renderContent(): void {
         this.element.querySelector('h2')!.textContent = this.project.projectTitle;
@@ -188,21 +188,42 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
 }
 //Project list class
 class ProjectList extends Component<HTMLDivElement, HTMLElement>
-{
+    implements DragTarget {
     assignedProjects: Project[] = [];
     constructor(private type: 'active' | 'finished') {
-        //beforeend
+        //beforeend - false
         super('project-list', 'app', false, `${type}-projects`);
         this.configure();
         this.renderContent();
     }
 
-    renderContent() {
-        const listId = `${this.type}-projects-list`;
-        this.element.querySelector('ul')!.id = listId;
-        this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
+    @AutoBind
+    dragOverHandler(event: DragEvent): void {
+        if(event.dataTransfer && event.dataTransfer.types[0]==='text/plain')
+            {
+                event.preventDefault();
+                const listEl = this.element.querySelector('ul');
+                if (listEl)
+                    listEl.classList.add('droppable');
+            }
     }
+
+    dropHandler(event: DragEvent): void {
+        console.log(event);
+    }
+
+    @AutoBind
+    dragLeaveHandler(event: DragEvent): void {
+        const listEl = this.element.querySelector('ul');
+        if (listEl)
+            listEl.classList.remove('droppable');
+    }
+
     configure(): void {
+        this.element.addEventListener('dragover', this.dragOverHandler);
+        this.element.addEventListener('drop', this.dropHandler);
+        this.element.addEventListener('dragleave', this.dragLeaveHandler);
+
         projectState.addSubscribers((projects: Project[]) => {
             const relevantProjects = projects.filter(proj => {
                 if (this.type === 'active')
@@ -214,12 +235,18 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
             this.renderAllProjects();
         });
     }
+
+    renderContent() {
+        const listId = `${this.type}-projects-list`;
+        this.element.querySelector('ul')!.id = listId;
+        this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
     private renderAllProjects() {
         const listProjectListElement = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
         //Avoiding project duplication, render always from the scratch
         listProjectListElement.innerHTML = '';
         this.assignedProjects.forEach(project => {
-            new ProjectItem(this.element.querySelector('ul')!.id,project); 
+            new ProjectItem(this.element.querySelector('ul')!.id, project);
         });
     }
 }

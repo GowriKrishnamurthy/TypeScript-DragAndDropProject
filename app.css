@@ -117,3 +117,11 @@
     margin: 0;
   }
   
+  .droppable {
+    background: #ffe3ee;
+  }
+  
+  #finished-projects .droppable {
+    background: #d6e1ff;
+  }
+  
