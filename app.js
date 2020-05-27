@@ -53,26 +53,22 @@ function validate(validatableInput) {
             isValid && (validatableInput.value.toString().length !== 0);
     }
     // min length makes sense only for string input
-    if (validatableInput.minLength != null
-        && typeof validatableInput.value === 'string') {
+    if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
         isValid =
             isValid && (validatableInput.value.length >= validatableInput.minLength);
     }
     // max length makes sense only for string input
-    if (validatableInput.maxLength != null
-        && typeof validatableInput.value === 'string') {
+    if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
         isValid =
             isValid && (validatableInput.value.length <= validatableInput.maxLength);
     }
     // min  makes sense only for number input
-    if (validatableInput.min != null
-        && typeof validatableInput.value === 'number') {
+    if (validatableInput.min != null && typeof validatableInput.value === 'number') {
         isValid =
             isValid && (validatableInput.value >= validatableInput.min);
     }
     // max  makes sense only for number input
-    if (validatableInput.max != null
-        && typeof validatableInput.value === 'number') {
+    if (validatableInput.max != null && typeof validatableInput.value === 'number') {
         isValid =
             isValid && (validatableInput.value <= validatableInput.max);
     }
@@ -101,7 +97,13 @@ class ProjectList {
         this.element = importedNode.firstElementChild;
         this.element.id = `${this.type}-projects`;
         projectState.addSubscribers((projects) => {
-            this.assignedProjects = projects;
+            const relevantProjects = projects.filter(proj => {
+                if (this.type === 'active')
+                    return proj.projectStatus === ProjectStatus.Active;
+                else
+                    return proj.projectStatus === ProjectStatus.Finished;
+            });
+            this.assignedProjects = relevantProjects;
             this.renderAllProjects();
         });
         //Attach element
@@ -115,6 +117,8 @@ class ProjectList {
     }
     renderAllProjects() {
         const listProjectListElement = document.getElementById(`${this.type}-projects-list`);
+        //Avoiding project duplication, render always from the scratch
+        listProjectListElement.innerHTML = '';
         this.assignedProjects.forEach(project => {
             const listItem = document.createElement('li');
             listItem.textContent = project.projectTitle;
@@ -158,9 +162,7 @@ class NewProjectInput {
             max: 100
         };
         //If any of the values is not entered correctly
-        if (!validate(projectTitleValidate) ||
-            !validate(projectDescriptionValidate) ||
-            !validate(numberOfPeopleValidate)) {
+        if (!validate(projectTitleValidate) || !validate(projectDescriptionValidate) || !validate(numberOfPeopleValidate)) {
             alert('Invalid input, please try again');
             return;
         }

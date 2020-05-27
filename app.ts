@@ -40,8 +40,7 @@ class ProjectState {
             projectTitle,
             projectDescription,
             numberOfPeople,
-            ProjectStatus.Active
-        );
+            ProjectStatus.Active);
 
         this.projects.push(newproject);
 
@@ -72,29 +71,25 @@ function validate(validatableInput: IValidatable) {
     }
 
     // min length makes sense only for string input
-    if (validatableInput.minLength != null
-        && typeof validatableInput.value === 'string') {
+    if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
         isValid =
             isValid && (validatableInput.value.length >= validatableInput.minLength)
     }
 
     // max length makes sense only for string input
-    if (validatableInput.maxLength != null
-        && typeof validatableInput.value === 'string') {
+    if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
         isValid =
             isValid && (validatableInput.value.length <= validatableInput.maxLength)
     }
 
     // min  makes sense only for number input
-    if (validatableInput.min != null
-        && typeof validatableInput.value === 'number') {
+    if (validatableInput.min != null && typeof validatableInput.value === 'number') {
         isValid =
             isValid && (validatableInput.value >= validatableInput.min)
     }
 
     // max  makes sense only for number input
-    if (validatableInput.max != null
-        && typeof validatableInput.value === 'number') {
+    if (validatableInput.max != null && typeof validatableInput.value === 'number') {
         isValid =
             isValid && (validatableInput.value <= validatableInput.max)
     }
@@ -105,8 +100,7 @@ function validate(validatableInput: IValidatable) {
 function AutoBind(
     _: any,
     _2: string,
-    descriptor: PropertyDescriptor
-) {
+    descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const adjDescriptor: PropertyDescriptor = {
         configurable: true,
@@ -133,7 +127,13 @@ class ProjectList {
         this.element.id = `${this.type}-projects`;
 
         projectState.addSubscribers((projects: Project[]) => {
-            this.assignedProjects = projects;
+            const relevantProjects = projects.filter(proj => {
+                if (this.type === 'active')
+                    return proj.projectStatus === ProjectStatus.Active;
+                else
+                    return proj.projectStatus === ProjectStatus.Finished;
+            });
+            this.assignedProjects = relevantProjects;
             this.renderAllProjects();
         });
 
@@ -149,6 +149,8 @@ class ProjectList {
     }
     private renderAllProjects() {
         const listProjectListElement = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+        //Avoiding project duplication, render always from the scratch
+        listProjectListElement.innerHTML = '';
         this.assignedProjects.forEach(project => {
             const listItem = document.createElement('li');
             listItem.textContent = project.projectTitle;
@@ -200,23 +202,19 @@ class NewProjectInput {
             minLength: 5
         };
         const numberOfPeopleValidate: IValidatable = {
-            value: +numberOfPeopleInputValue,
+            value: + numberOfPeopleInputValue,
             required: true,
             min: 1,
             max: 100
 
         };
         //If any of the values is not entered correctly
-        if (
-            !validate(projectTitleValidate) ||
-            !validate(projectDescriptionValidate) ||
-            !validate(numberOfPeopleValidate)
-        ) {
+        if (!validate(projectTitleValidate) || !validate(projectDescriptionValidate) || !validate(numberOfPeopleValidate)) {
             alert('Invalid input, please try again');
             return;
         }
         else {
-            return [projectTitleInputValue, projectDescriptionInputValue, +numberOfPeopleInputValue];
+            return [projectTitleInputValue, projectDescriptionInputValue, + numberOfPeopleInputValue];
         }
     }
 
@@ -249,4 +247,4 @@ class NewProjectInput {
 
 const newprojectInput = new NewProjectInput();
 const activeProjectList = new ProjectList('active');
-const finishedProjectList = new ProjectList('finished');
+const finishedProjectList = new ProjectList('finished'); 
