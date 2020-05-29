@@ -55,7 +55,19 @@ class ProjectState {
             ProjectStatus.Active);
 
         this.projects.push(newproject);
+        this.updateSubscribers();
+    }
 
+    moveProject(projectID: string, newProjectStatus: ProjectStatus) {
+        const selectedProject = this.projects.find(proj => proj.projectId === projectID);
+
+        if (selectedProject && selectedProject.projectStatus !== newProjectStatus) {
+            selectedProject.projectStatus = newProjectStatus;
+            this.updateSubscribers();
+        }
+    }
+
+    private updateSubscribers() {
         // Loop through all subscribers
         this.subscribers.forEach(subscriberFunction => {
             subscriberFunction(this.projects.slice());
@@ -168,7 +180,7 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
 
     @AutoBind
     dragStartHandler(event: DragEvent) {
-        event.dataTransfer!.setData('text/plain',this.project.projectId);
+        event.dataTransfer!.setData('text/plain', this.project.projectId);
         event.dataTransfer!.effectAllowed = 'move';
     }
 
@@ -199,17 +211,18 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
 
     @AutoBind
     dragOverHandler(event: DragEvent): void {
-        if(event.dataTransfer && event.dataTransfer.types[0]==='text/plain')
-            {
-                event.preventDefault();
-                const listEl = this.element.querySelector('ul');
-                if (listEl)
-                    listEl.classList.add('droppable');
-            }
+        if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+            event.preventDefault();
+            const listEl = this.element.querySelector('ul');
+            if (listEl)
+                listEl.classList.add('droppable');
+        }
     }
-
+    @AutoBind
     dropHandler(event: DragEvent): void {
-        console.log(event);
+        const projectId = event.dataTransfer!.getData('text/plain');
+        projectState.moveProject(projectId,
+            this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished);
     }
 
     @AutoBind
