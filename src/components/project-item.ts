@@ -1,39 +1,36 @@
+import { Draggable } from '../models/drag-drop.js';
+import { Project } from '../models/project.js';
+import { Component } from './base-component.js';
+import { AutoBind } from '../decorators/autobind.js';
 
-/// <reference path="base-component.ts"/>
-/// <reference path="../decorators/autobind.ts"/>
-/// <reference path="../models/project.ts"/>
-/// <reference path="../models/drag-drop.ts"/>
-namespace App
-{ 
-    export class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
-        implements Draggable {
-        private project: Project;
+export class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
+    implements Draggable {
+    private project: Project;
 
-        constructor(hostID: string, project: Project) {
-            super('project-item', hostID, false, project.projectId);
-            this.project = project;
-            this.configure();
-            this.renderContent();
-        }
+    constructor(hostID: string, project: Project) {
+        super('project-item', hostID, false, project.projectId);
+        this.project = project;
+        this.configure();
+        this.renderContent();
+    }
 
-        @AutoBind
-        dragStartHandler(event: DragEvent) {
-            event.dataTransfer!.setData('text/plain', this.project.projectId);
-            event.dataTransfer!.effectAllowed = 'move';
-        }
+    @AutoBind
+    dragStartHandler(event: DragEvent) {
+        event.dataTransfer!.setData('text/plain', this.project.projectId);
+        event.dataTransfer!.effectAllowed = 'move';
+    }
 
-        dragEndHandler(_: DragEvent) {
-            console.log('DragEnd');
-        }
+    dragEndHandler(_: DragEvent) {
+        console.log('DragEnd');
+    }
 
-        configure() {
-            this.element.addEventListener('dragstart', this.dragStartHandler);
-            this.element.addEventListener('dragend', this.dragEndHandler);
-        }
-        renderContent(): void {
-            this.element.querySelector('h2')!.textContent = this.project.projectTitle;
-            this.element.querySelector('h3')!.textContent = this.project.numberOfPeople.toString();
-            this.element.querySelector('p')!.textContent = this.project.projectDescription;
-        }
+    configure() {
+        this.element.addEventListener('dragstart', this.dragStartHandler);
+        this.element.addEventListener('dragend', this.dragEndHandler);
+    }
+    renderContent(): void {
+        this.element.querySelector('h2')!.textContent = this.project.projectTitle;
+        this.element.querySelector('h3')!.textContent = this.project.numberOfPeople.toString();
+        this.element.querySelector('p')!.textContent = this.project.projectDescription;
     }
 }
