@@ -1,6 +1,5 @@
 namespace App
 {
-    /// < reference path="drag-drop-interfaces.ts/>
     //Project type
     export enum ProjectStatus {
         Active,
