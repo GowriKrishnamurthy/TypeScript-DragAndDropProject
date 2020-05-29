@@ -1,9 +1,9 @@
-import { Project, ProjectStatus } from '../models/project.js';
-import { ProjectItem } from './project-item.js';
-import { projectState } from '../state/project-state.js';
-import { Component } from './base-component.js';
-import { AutoBind } from '../decorators/autobind.js';
-import { DragTarget } from '../models/drag-drop.js';
+import { Project, ProjectStatus } from '../models/project';
+import { ProjectItem } from './project-item';
+import { projectState } from '../state/project-state';
+import { Component } from './base-component';
+import { AutoBind } from '../decorators/autobind';
+import { DragTarget } from '../models/drag-drop';
 
 export class ProjectList extends Component<HTMLDivElement, HTMLElement>
     implements DragTarget {
@@ -32,7 +32,7 @@ export class ProjectList extends Component<HTMLDivElement, HTMLElement>
     }
 
     @AutoBind
-    dragLeaveHandler(event: DragEvent): void {
+    dragLeaveHandler(): void {
         const listEl = this.element.querySelector('ul');
         if (listEl)
         {

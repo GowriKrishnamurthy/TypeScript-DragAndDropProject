@@ -1,7 +1,7 @@
-import { Component } from './base-component.js';
-import { IValidatable,validate } from '../util/validation.js';
-import { AutoBind } from '../decorators/autobind.js';
-import { projectState } from '../state/project-state.js';
+import { Component } from './base-component';
+import * as Validation from '../util/validation';
+import { AutoBind } from '../decorators/autobind';
+import { projectState } from '../state/project-state';
 
 export class NewProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     //Input Controls on the form 
@@ -31,16 +31,16 @@ export class NewProjectInput extends Component<HTMLDivElement, HTMLFormElement> 
         const projectDescriptionInputValue = this.projectDescriptionInputElement.value;
         const numberOfPeopleInputValue = this.numberOfPeopleInputElement.value;
 
-        const projectTitleValidate: IValidatable = {
+        const projectTitleValidate: Validation.IValidatable = {
             value: projectTitleInputValue,
             required: true
         };
-        const projectDescriptionValidate: IValidatable = {
+        const projectDescriptionValidate: Validation.IValidatable = {
             value: projectDescriptionInputValue,
             required: true,
             minLength: 5
         };
-        const numberOfPeopleValidate: IValidatable = {
+        const numberOfPeopleValidate: Validation.IValidatable = {
             value: + numberOfPeopleInputValue,
             required: true,
             min: 1,
@@ -48,7 +48,9 @@ export class NewProjectInput extends Component<HTMLDivElement, HTMLFormElement> 
 
         };
         //If any of the values is not entered correctly
-        if (!validate(projectTitleValidate) || !validate(projectDescriptionValidate) || !validate(numberOfPeopleValidate)) {
+        if (!Validation.validate(projectTitleValidate) || 
+            !Validation.validate(projectDescriptionValidate) || 
+            !Validation.validate(numberOfPeopleValidate)) {
             alert('Invalid input, please try again');
             return;
         }
