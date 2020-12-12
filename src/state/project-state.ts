@@ -43,6 +43,15 @@ export class ProjectState {
         }
     }
 
+    removeProject(projectID: string, newProjectStatus: ProjectStatus) {
+        const selectedProject = this.projects.find(proj => proj.projectId === projectID);
+
+        if (selectedProject) {
+            this.projects.splice(this.projects.indexOf(selectedProject),1);
+            selectedProject.projectStatus = newProjectStatus;
+            this.updateSubscribers();
+        }
+    }
     private updateSubscribers() {
         // Loop through all subscribers
         this.subscribers.forEach(subscriberFunction => {
